@@ -1,0 +1,41 @@
+modules = ["java-graalvm22.3"]
+
+[nix]
+channel = "stable-24_05"
+
+[workflows]
+runButton = "Run MarketPulse"
+
+[[workflows.workflow]]
+name = "Market Data Service"
+author = 43345514
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "cd TradingApp/market-data && ./mvnw spring-boot:run"
+
+[[workflows.workflow]]
+name = "Run MarketPulse"
+author = 43345514
+mode = "parallel"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "cd TradingApp/market-data && ./mvnw spring-boot:run"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "cd processor && ./mvnw spring-boot:run"
+
+[[ports]]
+localPort = 8080
+externalPort = 8080
+
+[[ports]]
+localPort = 8081
+externalPort = 8081
+
+[[ports]]
+localPort = 35729
+externalPort = 80
