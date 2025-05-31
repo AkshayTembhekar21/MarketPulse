@@ -17,6 +17,9 @@ public class TradeService {
     @Autowired
     private TradeRepository tradeRepository;
 
+    @Autowired
+    private KafkaTemplate<String, String> kafkaTemplate;
+
     private final ObjectMapper mapper = new ObjectMapper();
 
     private double lastPrice = 0.0;
@@ -41,6 +44,15 @@ public class TradeService {
                         trade.setTimestamp(LocalDateTime.ofInstant(Instant.ofEpochMilli(ts), ZoneOffset.UTC));
 
                         tradeRepository.save(trade);
+
+                        // Publish trade update to Kafka for UI consumption
+                        try {
+                            String tradeJson = mapper.writeValueAsString(trade);
+                            kafkaTemplate.send("trade-updates", tradeJson);
+                            System.out.println("📊 Published trade update to Kafka: " + trade);
+                        } catch (Exception e) {
+                            System.err.println("Error publishing trade update: " + e.getMessage());
+                        }
 
                         System.out.println("✅ Saved trade to DB: " + trade);
                     }

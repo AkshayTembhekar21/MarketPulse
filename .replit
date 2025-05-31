@@ -28,6 +28,23 @@ args = "cd TradingApp/market-data && ./mvnw spring-boot:run"
 task = "shell.exec"
 args = "cd processor && ./mvnw spring-boot:run"
 
+[[workflows.workflow]]
+name = "Run MarketPulse + UI"
+author = 43345514
+mode = "parallel"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "cd TradingApp/market-data && ./mvnw spring-boot:run"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "cd processor && ./mvnw spring-boot:run"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "cd ui-desk && ./mvnw spring-boot:run"
+
 [[ports]]
 localPort = 8080
 externalPort = 8080
