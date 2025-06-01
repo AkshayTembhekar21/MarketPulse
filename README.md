@@ -1,6 +1,6 @@
 # MarketPulse
 
-MarketPulse is a real-time stock market data processing system built with Spring Boot and Apache Kafka. It ingests market data via WebSocket, processes and stores trade information, and publishes updates to Kafka topics for downstream consumers.
+MarketPulse is a real-time crypto market data processing system built with Spring Boot and Apache Kafka. It ingests market data via WebSocket, processes and stores trade information, and publishes updates to Kafka topics for downstream consumers.
 
 # Prerequisites
 
