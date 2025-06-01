@@ -255,6 +255,7 @@
             onMessage(event) {
                 try {
                     const trade = JSON.parse(event.data);
+                    console.log('Received trade:', trade);
                     this.addTrade(trade);
                 } catch (error) {
                     console.error('Error parsing trade data:', error);
@@ -280,13 +281,24 @@
             }
 
             addTrade(trade) {
-                this.trades.unshift(trade);
-                
-                // Keep only the last maxTrades
-                if (this.trades.length > this.maxTrades) {
-                    this.trades = this.trades.slice(0, this.maxTrades);
+                console.log('addTrade received:', trade, typeof trade);
+                if (typeof trade === 'string') {
+                    try {
+                        trade = JSON.parse(trade);
+                    } catch (e) {
+                        console.error('Failed to parse trade string:', e);
+                        return;
+                    }
                 }
-                
+                if (!trade || !trade.price || !trade.timestamp) {
+                    console.warn('Invalid trade object:', trade);
+                    return;
+                }
+                // Now safe to use trade.price and trade.timestamp
+                this.trades.unshift(trade);
+                if (this.trades.length > 1) {
+                    this.trades.length = 1;
+                }
                 this.renderTrades();
                 this.updateTradeCount();
             }
@@ -302,27 +314,28 @@
                     return;
                 }
 
-                this.tradesList.innerHTML = this.trades.map((trade, index) => {
-                    const isNew = index === 0; // First trade is the newest
-                    const timestamp = new Date(trade.timestamp).toLocaleString();
-                    
-                    return `
-                        <div class="trade-item ${isNew ? 'new' : ''}">
-                            <div class="trade-header">
-                                <span class="ticker">${trade.ticker || 'BTC'}</span>
-                                <span class="price">$${this.formatPrice(trade.price)}</span>
-                            </div>
-                            <div class="timestamp">📅 ${timestamp}</div>
-                        </div>
-                    `;
-                }).join('');
+                const trade = this.trades[0];  // Only latest trade
+                console.log('renderTrades trade object:', trade);
+                const ticker = trade.ticker;
+                const priceFormatted = this.formatPrice(trade.price);
+                const timestamp = new Date(trade.timestamp).toLocaleString();
 
-                // Remove 'new' class after animation
+                this.tradesList.innerHTML = `
+                    <div class="trade-item new">
+                        <div class="trade-header">
+                            <span class="ticker">${trade.ticker}</span>
+                            <span class="price">$${priceFormatted}</span>
+                        </div>
+                        <div class="timestamp">📅 ${timestamp}</div>
+                    </div>
+                `;
+
                 setTimeout(() => {
                     const newItems = this.tradesList.querySelectorAll('.trade-item.new');
                     newItems.forEach(item => item.classList.remove('new'));
                 }, 1000);
             }
+
 
             updateTradeCount() {
                 const count = this.trades.length;

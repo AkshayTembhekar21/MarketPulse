@@ -19,7 +19,6 @@ public class MarketDataConsumer {
 
     @KafkaListener(topics = "market-data", groupId = "market-data-consumer-group")
     public void consume(String message) {
-        System.out.println("📥 Received message: " + message);
         tradeService.processMessage(message);
         // TODO: parse JSON, calculate price change, filter, save trade if needed
     }
