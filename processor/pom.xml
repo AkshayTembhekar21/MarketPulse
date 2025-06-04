@@ -71,6 +71,35 @@
 			<artifactId>spring-kafka-test</artifactId>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<groupId>org.assertj</groupId>
+			<artifactId>assertj-core</artifactId>
+			<version>3.24.2</version>
+			<scope>test</scope>
+		</dependency>
+		<!-- JUnit Jupiter (JUnit 5) -->
+		<dependency>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter</artifactId>
+			<version>5.10.0</version>
+			<scope>test</scope>
+		</dependency>
+
+		<!-- Spring Boot Test -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<!-- AssertJ (if you're using assertThat style assertions) -->
+		<dependency>
+			<groupId>org.assertj</groupId>
+			<artifactId>assertj-core</artifactId>
+			<version>3.25.3</version>
+			<scope>test</scope>
+		</dependency>
+
 	</dependencies>
 
 	<build>

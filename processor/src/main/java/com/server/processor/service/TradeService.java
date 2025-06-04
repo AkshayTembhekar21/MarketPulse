@@ -42,11 +42,7 @@ public class TradeService {
 
                     lastPrice = price;
 
-                    Trade trade = new Trade();
-                    trade.setTicker(ticker);
-                    trade.setPrice(price);
-                    trade.setTimestamp(LocalDateTime.ofInstant(Instant.ofEpochMilli(ts), ZoneOffset.UTC));
-
+                    Trade trade = this.createTrade(ticker, price, ts);
                     //tradeRepository.save(trade);
 
                     // Publish trade update to Kafka for UI consumption
@@ -63,6 +59,14 @@ public class TradeService {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public static Trade createTrade(String ticker, double price, long ts){
+        Trade trade = new Trade();
+        trade.setTicker(ticker);
+        trade.setPrice(price);
+        trade.setTimestamp(LocalDateTime.ofInstant(Instant.ofEpochMilli(ts), ZoneOffset.UTC));
+        return trade;
     }
 }
 // This service processes incoming market data messages, extracts trade information
