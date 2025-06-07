@@ -30,31 +30,74 @@ jobs:
         working-directory: ./TradingApp/market-data
         run: mvn clean package -B
 
+      # Debug market-data target folder
+      - name: Debug market-data target folder
+        working-directory: ./TradingApp/market-data
+        run: ls -la target/ || echo "Target folder not found"
+
       # Build processor
       - name: Build processor
         working-directory: ./processor
         run: mvn clean package -B
+
+      # Debug processor target folder
+      - name: Debug processor target folder
+        working-directory: ./processor
+        run: ls -la target/ || echo "Target folder not found"
 
       # Build ui-desk
       - name: Build ui-desk
         working-directory: ./ui-desk
         run: mvn clean package -B
 
-      # Upload JAR artifacts
+      # Debug ui-desk target folder
+      - name: Debug ui-desk target folder
+        working-directory: ./ui-desk
+        run: ls -la target/ || echo "Target folder not found"
+
+      # Upload JAR artifacts (for all events)
       - name: Upload market-data JAR
         uses: actions/upload-artifact@v4
         with:
           name: market-data-jar
           path: TradingApp/market-data/target/*.jar
+        continue-on-error: true
 
       - name: Upload processor JAR
         uses: actions/upload-artifact@v4
         with:
           name: processor-jar
           path: processor/target/*.jar
+        continue-on-error: true
 
       - name: Upload ui-desk JAR
         uses: actions/upload-artifact@v4
         with:
           name: ui-desk-jar
           path: ui-desk/target/*.jar
+        continue-on-error: true
+
+      # Configure AWS credentials (only on push to master)
+      - name: Configure AWS Credentials
+        if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ap-south-1
+
+      # Upload JARs to S3 (only on push to master)
+      - name: Upload market-data JAR to S3
+        if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+        run: aws s3 cp TradingApp/market-data/target/*.jar s3://${{ secrets.AWS_S3_BUCKET }}/market-data/ --region ap-south-1
+        continue-on-error: true
+
+      - name: Upload processor JAR to S3
+        if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+        run: aws s3 cp processor/target/*.jar s3://${{ secrets.AWS_S3_BUCKET }}/processor/ --region ap-south-1
+        continue-on-error: true
+
+      - name: Upload ui-desk JAR to S3
+        if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+        run: aws s3 cp ui-desk/target/*.jar s3://${{ secrets.AWS_S3_BUCKET }}/ui-desk/ --region ap-south-1
+        continue-on-error: true
