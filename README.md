@@ -7,7 +7,7 @@ This repository is archived. The project has been split into:
 - [MarketPulse-config](https://github.com/AkshayTembhekar21/MarketPulse-config)
 
 MarketPulse is a real-time crypto market data processing system built with Spring Boot and Apache Kafka. It ingests market data via WebSocket, processes and stores trade information, and publishes updates to Kafka topics for downstream consumers.
-#Architechture
+# Architechture
 ┌─────────────────────────────────────────────────────────────────────────────┐
 │                           MARKETPULSE - LOCAL SETUP                          │
 └─────────────────────────────────────────────────────────────────────────────┘
