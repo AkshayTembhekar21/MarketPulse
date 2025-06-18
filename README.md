@@ -7,6 +7,102 @@ This repository is archived. The project has been split into:
 - [MarketPulse-config](https://github.com/AkshayTembhekar21/MarketPulse-config)
 
 MarketPulse is a real-time crypto market data processing system built with Spring Boot and Apache Kafka. It ingests market data via WebSocket, processes and stores trade information, and publishes updates to Kafka topics for downstream consumers.
+Architechture
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                           MARKETPULSE - LOCAL SETUP                          │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
+│   FINNHUB API   │    │   KAFKA UI      │    │   H2 DATABASE   │
+│   (External)    │    │   (Port 9000)   │    │   (In-Memory)   │
+└─────────────────┘    └─────────────────┘    └─────────────────┘
+         │                       │                       │
+         │                       │                       │
+         ▼                       │                       │
+┌─────────────────┐              │                       │
+│ MARKET-DATA     │              │                       │
+│ SERVICE         │──────────────┼───────────────────────┼──┐
+│ (Port 8080)     │              │                       │  │
+│                 │              │                       │  │
+│ • WebSocket     │              │                       │  │
+│   Client        │              │                       │  │
+│ • Kafka         │              │                       │  │
+│   Producer      │              │                       │  │
+└─────────────────┘              │                       │  │
+         │                       │                       │  │
+         │                       │                       │  │
+         ▼                       │                       │  │
+┌─────────────────┐              │                       │  │
+│     KAFKA       │              │                       │  │
+│   (Port 9092)   │              │                       │  │
+│                 │              │                       │  │
+│ • Zookeeper     │              │                       │  │
+│   (Port 2181)   │              │                       │  │
+└─────────────────┘              │                       │  │
+         │                       │                       │  │
+         │                       │                       │  │
+         ▼                       │                       │  │
+┌─────────────────┐              │                       │  │
+│   PROCESSOR     │              │                       │  │
+│   SERVICE       │──────────────┼───────────────────────┼──┘
+│   (Port 8081)   │              │                       │
+│                 │              │                       │
+│ • Kafka         │              │                       │
+│   Consumer      │              │                       │
+│ • Trade         │              │                       │
+│   Processing    │              │                       │
+│ • WebSocket     │              │                       │
+│   Publisher     │              │                       │
+└─────────────────┘              │                       │
+         │                       │                       │
+         │                       │                       │
+         ▼                       │                       │
+┌─────────────────┐              │                       │
+│   UI-DESK       │              │                       │
+│   SERVICE       │──────────────┼───────────────────────┼──┐
+│   (Port 8082)   │              │                       │  │
+│                 │              │                       │  │
+│ • Web UI        │              │                       │  │
+│ • Kafka         │              │                       │  │
+│   Consumer      │              │                       │  │
+│ • WebSocket     │              │                       │  │
+│   Handler       │              │                       │  │
+└─────────────────┘              │                       │  │
+         │                       │                       │  │
+         ▼                       │                       │  │
+┌─────────────────┐              │                       │  │
+│   BROWSER       │              │                       │  │
+│   (User)        │              │                       │  │
+└─────────────────┘              │                       │  │
+                                 │                       │  │
+                                 ▼                       │  │
+                        ┌─────────────────┐              │  │
+                        │   DOCKER        │              │  │
+                        │   COMPOSE       │              │  │
+                        │   (Local)       │              │  │
+                        └─────────────────┘              │  │
+                                                         │  │
+                                                         │  │
+                                                         │  │
+                                                         │  │
+                                                         │  │
+                                    
+Now, let's explain this diagram in simple terms:
+
+- **Finnhub API**: This is an external service providing real-time market data.
+- **MarketPulse-market-data**: This service connects to Finnhub via WebSocket, receives market data, and pushes it to Kafka.
+- **Kafka & Zookeeper**: Kafka is a message broker that allows different services to communicate asynchronously. Zookeeper helps manage Kafka.
+- **MarketPulse-processor**: This service consumes market data from Kafka, processes it (e.g., trade logic), stores it in an H2 in-memory database, and can send updates via WebSocket.
+- **MarketPulse-ui-desk**: This is the user interface service. It consumes updates from Kafka and/or WebSocket and serves a web UI to the user.
+- **Browser**: The end user interacts with the UI via their browser.
+- **Docker Compose**: Used locally to orchestrate (run) all these services together on your machine.
+
+---
+
+## 🏗️ **TARGET ARCHITECTURE: AWS EKS (Cloud Deployment)**
+
+Here's how your project will look after we move it to AWS EKS:
+
 
 # Prerequisites
 
